@@ -18,6 +18,8 @@ AGENT_ENDPOINTS = [
     "http://localhost:10002",
 ]
 
+BOOTSTRAP_SERVERS = "kafka:29092"
+
 class State(TypedDict):
     messages: Annotated[List[BaseMessage], add_messages]
 
@@ -138,7 +140,7 @@ def build_workflow(agents_info: List[Dict]):
 async def run():
     consumer = AIOKafkaConsumer(
         'qachat',
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers=BOOTSTRAP_SERVERS,
         group_id='agent2',
         value_deserializer=lambda x: json.loads(x.decode('utf-8')),
         auto_offset_reset='latest',
@@ -147,7 +149,7 @@ async def run():
     await consumer.start()
 
     producer = AIOKafkaProducer(
-        bootstrap_servers='localhost:9092',
+        bootstrap_servers=BOOTSTRAP_SERVERS,
         value_serializer=lambda x: json.dumps(x).encode('utf-8'),
         linger_ms=0,
     )

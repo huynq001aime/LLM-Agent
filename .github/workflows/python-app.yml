@@ -37,3 +37,34 @@ jobs:
     - name: Test with pytest
       run: |
         pytest tests_hehe/
+  
+    - name: Build Docker image
+      run: |
+        docker build -t shuttfubbb/grpc_server:test .
+
+    - name: Save Docker image to tar
+      run: |
+        docker save -o llm_agent.tar shuttfubbb/grpc_server:test
+
+    - name: Copy image tar to remote server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        source: "llm_agent.tar"
+        target: "/home/aime/huynq/LLM-Agent/llm_agent.tar"
+
+    - name: Deploy on remote server via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT }}
+        script: |
+          docker load -i /home/${{ secrets.SSH_USER }}/llm_agent.tar
+          docker stop llm_agent || true
+          docker rm llm_agent || true
+          docker run -d --name llm_agent --env-file /home/aime/huynq/LLM-Agent/env.env -p 10000:10000 -p 10002:10002 shuttfubbb/grpc_server:test

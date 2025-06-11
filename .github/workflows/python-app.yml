@@ -67,4 +67,4 @@ jobs:
           docker load -i /home/${{ secrets.SSH_USER }}/llm_agent.tar
           docker stop llm_agent || true
           docker rm llm_agent || true
-          docker run -d --name llm_agent --env-file /home/aime/huynq/LLM-Agent/env.env -p 10000:10000 -p 10002:10002 shuttfubbb/grpc_server:test
+          docker run -d --name llm_agent --env-file /home/aime/huynq/LLM-Agent/.env -p 10000:10000 -p 10002:10002 shuttfubbb/grpc_server:test

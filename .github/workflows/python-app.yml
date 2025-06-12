@@ -55,7 +55,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         port: ${{ secrets.SSH_PORT }}
         source: "llm_agent.tar"
-        target: "/home/aime/huynq/LLM-Agent/llm_agent.tar"
+        target: "/home/aime/huynq/LLM-Agent/"
 
     - name: Deploy on remote server via SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -68,4 +68,4 @@ jobs:
           docker load -i /home/aime/huynq/LLM-Agent/llm_agent.tar
           docker stop llm_agent || true
           docker rm llm_agent || true
-          docker run -d --name llm_agent --env-file /home/aime/huynq/LLM-Agent/.env -p 10000:10000 -p 10002:10002 shuttfubbb/grpc_server:test
+          docker run -d --restart unless-stopped --name llm_agent --env-file /home/aime/huynq/LLM-Agent/.env -p 10000:10000 -p 10002:10002 shuttfubbb/grpc_server:test
